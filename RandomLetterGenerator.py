@@ -3,7 +3,7 @@ import random
 
 
 class RandomLetterApp:
-    def __init__(self, root):
+    def __init__(self, root, N):
         self.root = root
         self.root.title("Random Letter Display")
         self.label = tk.Label(root, font=("Helvetica", 150))
@@ -14,7 +14,10 @@ class RandomLetterApp:
         # Map with all letters set to "unused"
         self.letters = {letter: "unused" for letter in custom_letters}
         self.current_letter = None
-
+        
+        # Number of segments
+        self.N = N 
+        self.current_cycle = 0
         # Bind space key to reset function
         self.root.bind("<space>", self.on_space_press)
         
@@ -35,13 +38,20 @@ class RandomLetterApp:
             # Mark it as used for the next cycle if space is not pressed
             self.letters[self.current_letter] = "used"
         else:
-           
-            self.label.config(text="Kreće novi red.", font=("Helvetica", 50),wraplength=800)
-            self.label.pack(pady=235)
-            self.label.update_idletasks() 
-            self.reset_letters()
+            self.current_cycle += 1
+            if self.current_cycle < self.N:
+                self.label.config(text="Kreće novi red.", font=("Helvetica", 50),wraplength=800)
+                self.label.pack(pady=235)
+                self.label.update_idletasks() 
+                self.reset_letters()
+            else:
+                self.label.config(text="Gotovo!", font=("Helvetica", 50), wraplength=800)
+                self.label.pack(pady=235)
+                self.label.update_idletasks()
+                self.root.after(2000, self.root.quit)  # Close app after showing final message
+
         # Schedule the next update after 1 second
-        self.root.after(1000, self.update_letter)
+        self.root.after(250, self.update_letter)
 
     def on_space_press(self, event):
         # Print the current letter
@@ -57,7 +67,8 @@ class RandomLetterApp:
         self.letters = {letter: "unused" for letter in custom_letters}
 
 # Run the tkinter application
+N = 1
 root = tk.Tk()
 root.geometry("1000x600")
-app = RandomLetterApp(root)
+app = RandomLetterApp(root, N)
 root.mainloop()
