@@ -57,7 +57,7 @@ y = np.array(letter_occurrences)
 # Now let's use peak detection to identify the P300 response around each event
 # Peak detection function using dynamic threshold based on standard deviation
 
-def detect_p300(epochs_data, threshold_factor=3.5):
+def detect_p300(epochs_data, threshold_factor=3.4):
     """Detects P300 peak using standard deviation-based threshold."""
     p300_peak_labels = []
 

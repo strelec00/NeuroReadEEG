@@ -11,7 +11,7 @@ import subprocess
 print(f"Data is saved in: {os.getcwd()}")
 
 class RandomLetterApp:
-    def __init__(self, root, marker_dict, lock, first_letter_timestamps, max_updates=4, markers_file="markers.csv"):
+    def __init__(self, root, lock, first_letter_timestamps, max_updates=4):
         self.root = root
         self.root.title("Random Letter Display")
         self.label = tk.Label(root, font=("Helvetica", 150))
@@ -22,14 +22,8 @@ class RandomLetterApp:
         self.letter_id = 0
         self.update_counter = 0
         self.max_updates = max_updates
-        self.marker_dict = marker_dict
         self.lock = lock
         self.first_letter_timestamps = defaultdict(list)  # Store **all** timestamps
-
-        self.markers_file = markers_file
-        self.file = open(self.markers_file, mode='w', newline='')
-        self.writer = csv.DictWriter(self.file, fieldnames=["ID", "Letter"])
-        self.writer.writeheader()
 
         self.letters = {letter: "unused" for letter in self.custom_letters}
         self.current_letter = None
@@ -41,14 +35,8 @@ class RandomLetterApp:
         current_time = time.time()  # Get current timestamp
 
         with self.lock:
-            self.marker_dict[self.letter_id] = letter
-
             # Store **ALL** timestamps, not just the first appearance
             self.first_letter_timestamps[letter].append(current_time)
-
-        print(f"Marker added: {self.letter_id} - {letter} at {current_time}")
-
-        self.writer.writerow({"ID": self.letter_id, "Letter": letter})
 
     def update_letter(self):
         if self.update_counter >= self.max_updates:
@@ -131,8 +119,6 @@ def process_lsl_data(marker_dict, lock, first_letter_timestamps):
         except KeyboardInterrupt:
             print("\nData collection stopped.")
             file.flush()
-
-
 def main():
     root = tk.Tk()
     root.geometry("1000x600")
@@ -146,7 +132,7 @@ def main():
 
     time.sleep(0.5) # Ensure data recording starts before the app starts
 
-    app = RandomLetterApp(root, marker_dict, lock, first_letter_timestamps, max_updates=4)
+    app = RandomLetterApp(root, lock, first_letter_timestamps, max_updates=4)
 
     root.mainloop()
     app.save_first_letter_timestamps()  # Save timestamps after GUI closes

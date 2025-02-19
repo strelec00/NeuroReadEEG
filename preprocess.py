@@ -49,26 +49,4 @@ for channel in lsl_df.columns[1:-2]:  # Assuming EEG channels are in columns 1 t
 # Save the preprocessed EEG data
 lsl_df.to_csv("updated_lsl_data.csv", index=False)
 
-# Segment the signal into epochs
-epochs = []
-stimulus_indices = lsl_df[lsl_df["Stimulus"] == 1].index
-
-for idx in stimulus_indices:
-    start = idx - int(0.2 * fs)  # 200 ms before the stimulus
-    end = idx + int(0.8 * fs)    # 800 ms after the stimulus
-    if start >= 0 and end < len(lsl_df):
-        epoch = lsl_df.iloc[start:end, 1:-2].values  # Exclude non-EEG columns
-        epochs.append(epoch)
-
-epochs = np.array(epochs)
-
-# Normalize the data
-from sklearn.preprocessing import StandardScaler
-X = epochs.reshape(epochs.shape[0], -1)  # Flatten epochs
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
-# Save the processed epochs for classification
-np.save('processed_epochs.npy', epochs)
-
 print("Preprocessing complete. Data saved.")
